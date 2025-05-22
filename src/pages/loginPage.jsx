@@ -23,7 +23,7 @@ export default function LoginPage() {
 
                 const user = response.data.user;
                 if(user.role == "admin") {
-                    //go to aadmn page
+                    //go to admin page
                     navigate("/admin")
                 }else {
                     //go to home page
