@@ -6,6 +6,7 @@ import Testing from './pages/testing';
 import { Toaster } from 'react-hot-toast';
 import RegisterPage from './pages/client/register';
 
+
 function App(){
 
   return (
