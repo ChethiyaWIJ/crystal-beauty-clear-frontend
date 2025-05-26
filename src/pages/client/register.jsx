@@ -47,7 +47,7 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="w-full h-screen bg-[url(/login-bg.jpg)] bg-cover bg-center flex">
+        <div className="w-full h-screen bg-[url(/register-bg.jpg)] bg-cover bg-center flex">
             <div className="w-[50%] h-full"></div>
             <div className="w-[50%] h-full flex justify-center items-center">
                 <div className="w-[450px] min-h-[750px] backdrop-blur-xl shadow-xl rounded-xl flex flex-col justify-center items-center">
@@ -60,7 +60,7 @@ export default function RegisterPage() {
                     <button onClick={handleRegister} className="w-[400px] h-[50px] text-white bg-green-400 rounded-xl m-[5px] cursor-pointer">
                         {loading ? "Registering..." : "Register"}
                     </button>
-                    <p className="text-gray-600 font-bold">
+                    <p className="text-white font-bold">
                         Already have an account?
                         &nbsp;
                         <span className="text-green-500 font-bold hover:text-green-600">
