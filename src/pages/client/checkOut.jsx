@@ -1,27 +1,68 @@
 import { TbTrash } from "react-icons/tb";
-import { addToCart, getCart, getTotal, getTotalForLabledPrice, removeFromCart } from "../../utils/cart"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BsCart4 } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios, { AxiosHeaders } from "axios";
 import toast from "react-hot-toast";
 
-export default function CartPage(){
+export default function CheckOutPage(){
 
     let navigate = useNavigate();
+    const location = useLocation();
+    const [cart , setCart] = useState(location.state.items)
+    const [cartRefresh, setCartRefresh] = useState(false)
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
 
-    const [cartLoaded , setCartLoaded] = useState(false);
-    const [cart , setCart] = useState([]);
-    
-    useEffect(
-        ()=>{
-            if(cartLoaded == false){
-                const cart = getCart()
-                setCart(cart)
-                setCartLoaded(true)
+    function getTotal(){
+        let total = 0;
+        cart.forEach((item)=>{
+            total += item.price * item.quantity
+        })
+        return total;
+    }
+
+    function getTotalForLabledPrice(){
+        let total = 0;
+        cart.forEach((item)=>{
+            total += item.labledPrice *  item.quantity
+        }) 
+        return total;
+    }
+
+    function placeOrder(){
+        const orderData = {
+            name : name,
+            address : address,
+            phoneNumber : phoneNumber,
+            billItems : []
+        }
+
+        for(let i = 0; i < cart.length; i++){
+            orderData.billItems[i] = {
+                productId : cart[i].productId,
+                quantity : cart[i].quantity
             }
-        },
-        [cartLoaded]
-    )
+        }
+
+        const token = localStorage.getItem("token");
+        axios.post(import.meta.env.VITE_BACKEND_URL+ "/api/order", orderData, {
+            headers : {
+                Authorization  : "Bearer " + token
+            },
+        }).then(
+            ()=>{
+                toast.success("Order placed succesfully")
+                navigate("/")
+            }
+        ).catch(
+            (err)=>{
+                console.log(err)
+                toast.error("Order placement failed")
+            }
+        )
+    }
 
     return(
         <div className="w-full h-full flex justify-center p-[40px]">
@@ -46,8 +87,8 @@ export default function CartPage(){
                                         <button className="w-[40px] h-[40px] text-white text-2xl bg-red-500 rounded-full flex justify-center items-center shadow cursor-pointer absolute right-[-60px]" 
                                         onClick={
                                             ()=>{
-                                                removeFromCart(item.productId)
-                                                setCartLoaded(false)
+                                                const newCart = cart.filter((product) => product.productId !== item.productId)
+                                                setCart(newCart)
                                             }
                                         }>
                                             <TbTrash/>
@@ -62,18 +103,21 @@ export default function CartPage(){
                                             <button className="text-2xl w-[30px] h-[30px] bg-black text-white rounded-full flex justify-center items-center cursor-pointer mx-[5px]"
                                             onClick={
                                                 ()=>{
-                                                    addToCart(item,-1)
-                                                    toast.success("Item removed from cart")
-                                                    setCartLoaded(false)
+                                                    const newCart = cart
+                                                    newCart[index].quantity -= 1
+                                                    if(newCart[index].quantity <= 0) newCart[index].quantity = 1
+                                                    setCart(newCart)
+                                                    setCartRefresh(!cartRefresh)
                                                 }
                                             }>-</button>
                                             <h1 className="text-xl font-bold">{item.quantity}</h1>
                                             <button className="text-2xl w-[30px] h-[30px] bg-black text-white rounded-full flex justify-center items-center cursor-pointer mx-[5px]"
                                             onClick={
                                                 ()=>{
-                                                    addToCart(item,1)
-                                                    toast.success("Item added to cart")
-                                                    setCartLoaded(false)
+                                                    const newCart  = cart
+                                                    newCart[index].quantity += 1
+                                                    setCart(newCart)
+                                                    setCartRefresh(!cartRefresh)
                                                 }
                                             }>+</button>
                                         </div>
@@ -97,22 +141,24 @@ export default function CartPage(){
                         <h1 className="w-[120px] text-xl text-end pr-2">Net total</h1>
                         <h1 className="w-[120px] text-xl text-end pr-2 border-b-[5px] border-double">{getTotal().toFixed(2)}</h1>
                     </div>
-                    <div className="w-full flex justify-end mt-4">
+                    <div className="w-full my-[5px] p-[4px]">
+                        <input type="text" value={name} placeholder="Name" onChange={(e)=>setName(e.target.value)}
+                        className="w-full h-[40px] border-2 border-gray-500 rounded-lg my-[4px] p-1"/>
+                        <input type="text" value={address} placeholder="Address" onChange={(e)=>setAddress(e.target.value)}
+                        className="w-full h-[40px] border-2 border-gray-500 rounded-lg my-[4px] p-1"/>
+                        <input type="tel" value={phoneNumber} placeholder="Phone Number" onChange={(e)=>setPhoneNumber(e.target.value)}
+                        className="w-full h-[40px] border-2 border-gray-500 rounded-lg my-[4px] p-1"/>
+                    </div>
+                    <div className="w-full flex justify-center mt-4">
                         <button className="w-[100px] h-[30px] bg-pink-500 border border-pink-500 text-center text-white font-bold rounded-lg cursor-pointer hover:bg-white hover:text-pink-500"
                         onClick={
                             ()=>{
-                                navigate("/checkout",
-                                    {
-                                        state : {
-                                            items : cart
-                                        }
-                                    }
-
-                                )
+                               placeOrder()
                             }
                         }
-                        >Checkout</button>
+                        >Place Order</button>
                     </div>
+                    
             </div>
         </div>
     )

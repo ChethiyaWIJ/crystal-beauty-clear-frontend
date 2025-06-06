@@ -45,3 +45,22 @@ export function removeFromCart(productId){
     toast.success("Item deleted from cart")
     return cart
 }
+
+export function getTotal(){
+    let cart = getCart();
+    let total = 0;
+    cart.forEach((product)=>{
+        total += product.price * product.quantity
+    })
+    return total;
+    
+}
+
+export function getTotalForLabledPrice(){
+    let cart = getCart();
+    let labledPriceTotal = 0;
+    cart.forEach((product)=>{
+        labledPriceTotal += product.labledPrice * product.quantity
+    })
+    return labledPriceTotal;
+}

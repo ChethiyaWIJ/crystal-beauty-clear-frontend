@@ -3,6 +3,7 @@ import Header from "../compoenents/header";
 import ProductsPage from "./client/productsPage";
 import ProductOverview from "./client/productOverview";
 import CartPage from "./client/cart";
+import CheckOutPage from "./client/checkOut";
 
 export default function HomePage() {
     return(
@@ -16,6 +17,7 @@ export default function HomePage() {
                     <Route path="/reviews" element={<h1>Reviews</h1>}/>
                     <Route path="/overview/:id" element={<ProductOverview/>}/>
                     <Route path="/cart" element={<CartPage/>}/>
+                    <Route path="/checkout" element={<h1><CheckOutPage/></h1>}/>
                     <Route path="/*" element={<h1>404 Error Not Found !</h1>}/>
                 </Routes>
             </div>

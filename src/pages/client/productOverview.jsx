@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import Loader from "../../compoenents/loader";
 import ImageSlider from "../../compoenents/imageSlider";
 import { addToCart, getCart } from "../../utils/cart";
@@ -16,6 +16,8 @@ const params = useParams();
 
  const[product, setProduct] = useState(null);
  const[status, setStatus] = useState("loading"); // loaded, error
+
+ const navigate = useNavigate();
 
  useEffect(
     ()=>{
@@ -71,7 +73,26 @@ const params = useParams();
                                     }}>
                                     Add to Cart
                                 </button>
-                                <button className="w-[200px] h-[50px] bg-pink-500 border border-pink-500 text-white text-center font-bold rounded-lg cursor-pointer hover:bg-white hover:text-pink-500 mx-5 ">
+                                <button className="w-[200px] h-[50px] bg-pink-500 border border-pink-500 text-white text-center font-bold rounded-lg cursor-pointer hover:bg-white hover:text-pink-500 mx-5 "
+                                onClick={
+                                    ()=>{
+                                        navigate("/checkout",{
+                                            state : {
+                                                items : [
+                                                    {
+                                                        productId : product.productId,
+                                                        name : product.name,
+                                                        altNames : product.altNames,
+                                                        price : product.price,
+                                                        labledPrice : product.labledPrice,
+                                                        image : product.images[0],
+                                                        quantity : 1
+                                                    }
+                                                ]
+                                            }
+                                        })
+                                    }
+                                }>
                                     Buy now
                                 </button>
                             </div>
