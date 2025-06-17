@@ -2,6 +2,8 @@ import { useState } from "react"
 import axios from "axios"
 import toast from "react-hot-toast"
 import { Link, useNavigate } from "react-router-dom"
+import { useGoogleLogin } from "@react-oauth/google"
+import { GrGoogle } from "react-icons/gr"
 
 export default function LoginPage() {
 
@@ -9,6 +11,37 @@ export default function LoginPage() {
     const[password,setPassword] = useState("")
     const[loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const loginWithGoogle = useGoogleLogin(
+        {
+            onSuccess : (res)=>{
+                setLoading(true)
+                axios.post(import.meta.env.VITE_BACKEND_URL+"/api/user/google",{
+                    accessToken : res.access_token
+                }).then(
+            (response)=>{
+                console.log("Login successful", response.data);
+                toast.success("Login successful");
+                localStorage.setItem("token",response.data.token);
+
+                const user = response.data.user;
+                if(user.role == "admin") {
+                    //go to admin page
+                    navigate("/admin")
+                }else {
+                    //go to home page
+                    navigate("/user")
+                }
+                setLoading(false)
+            }
+        )
+            },
+
+            onError : (err)=>{
+                console.log("Error",err)
+            }
+        }
+    )
+    
 
     function HandleLogin() {
         setLoading(true)
@@ -62,6 +95,17 @@ export default function LoginPage() {
                         {
                             loading?"Loading...":"Login"
                         }
+                    </button>
+                    <button className="w-[400px] h-[50px] text-white bg-green-400 rounded-xl m-[5px] cursor-pointer flex justify-center items-center"
+                    onClick={
+                        ()=>{
+                            loginWithGoogle()
+                        }
+                    }>
+                        <GrGoogle className="mr-2"/>
+                        {
+                            loading?" Loading...":" Login with Google"
+                        } 
                     </button>
                     <p className="text-gray-500 font-bold">
                         Don't have an account yet ?
